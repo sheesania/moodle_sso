@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Moodle Authentication feature.
+ */
+
+include_once 'moodle_sso.features.inc';
