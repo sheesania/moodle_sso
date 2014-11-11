@@ -12,4 +12,5 @@ dependencies[] = user_revision
 features[ctools][] = services:services:3
 features[ctools][] = views:views_default:3.0
 features[features_api][] = api:2
+features[services_endpoint][] = moodlesso
 features_exclude[dependencies][features] = features

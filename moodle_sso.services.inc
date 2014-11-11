@@ -13,9 +13,9 @@ function moodle_sso_default_services_endpoint() {
   $endpoint = new stdClass();
   $endpoint->disabled = FALSE; /* Edit this to true to make a default endpoint disabled initially */
   $endpoint->api_version = 3;
-  $endpoint->name = 'moodle';
+  $endpoint->name = 'moodlesso';
   $endpoint->server = 'rest_server';
-  $endpoint->path = 'drupalservice';
+  $endpoint->path = 'moodlesso';
   $endpoint->authentication = array(
     'services' => 'services',
   );
@@ -37,13 +37,6 @@ function moodle_sso_default_services_endpoint() {
     ),
   );
   $endpoint->resources = array(
-    'muser' => array(
-      'operations' => array(
-        'index' => array(
-          'enabled' => '1',
-        ),
-      ),
-    ),
     'system' => array(
       'actions' => array(
         'connect' => array(
@@ -63,17 +56,18 @@ function moodle_sso_default_services_endpoint() {
       'actions' => array(
         'login' => array(
           'enabled' => '1',
-          'settings' => array(
-            'services' => array(
-              'resource_api_version' => '1.0',
-            ),
-          ),
+        ),
+        'logout' => array(
+          'enabled' => '1',
+        ),
+        'token' => array(
+          'enabled' => '1',
         ),
       ),
     ),
   );
-  $endpoint->debug = 1;
-  $export['moodle'] = $endpoint;
+  $endpoint->debug = 0;
+  $export['moodlesso'] = $endpoint;
 
   return $export;
 }
