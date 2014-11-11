@@ -5,3 +5,69 @@
  */
 
 include_once 'moodle_sso.features.inc';
+
+
+/**
+ *  Implements hook_services_resources_alter().
+ * the goal is to override how users are listed in the index service for
+ * just the moodlesso service endpoint. This endpoint has the specific task of providing paginated
+ * user results to the sync script of the drupalservices moodle plugin.
+ *
+ */
+function moodle_sso_services_resources_alter(&$resources, $endpoint)
+{
+
+  if($endpoint->name=='moodlesso') {
+    //alter the user resource index callback to use this one.
+    // this will allow us to specify proper sorting of users based on pagination and sorting
+    $resources['user']['operations']['index']['callback'] = 'moodle_sso_user_resource_index';
+    $resources['user']['operations']['index']['args'] = array(
+      array(
+        'name' => 'date',
+        'optional' => TRUE,
+        'type' => 'int',
+        'description' => 'The zero-based index of the page to get, defaults to 0.',
+        'default value' => 0,
+        'source' => array('param' => 'date'),
+      ),
+      array(
+        'name' => 'page',
+        'optional' => TRUE,
+        'type' => 'int',
+        'description' => 'The zero-based index of the page to get, defaults to 0.',
+        'default value' => 0,
+        'source' => array('param' => 'page'),
+      ),
+      array(
+        'name' => 'pagesize',
+        'optional' => TRUE,
+        'type' => 'int',
+        'description' => 'Number of records to get per page.',
+        'default value' => variable_get('services_user_index_page_size', 20),
+        'source' => array('param' => 'pagesize'),
+      ),
+    );
+  }
+
+}
+
+
+function moodle_sso_user_resource_index($date, $page, $page_size) {
+  $fields="uid,vid,name,created";
+
+  // change the ordering to allow for paginated optimizations
+  // this module also depends on user_revision so we can rely on the vid for ordering
+  // so that changes can be tracked
+  $user_select = db_select('users', 't');
+  $user_select->fields('r', array('timestamp'));
+  $user_select->addJoin('left','user_revision','r', "t.vid=r.vid");
+  $user_select->condition('r.timestamp',$date,">=");
+  $user_select->orderBy('r.timestamp', 'asc');
+  $user_select->orderBy('t.vid', 'asc');
+
+  services_resource_build_index_query($user_select, $page, $fields, array(), $page_size, 'user');
+
+  $results = services_resource_execute_index_query($user_select);
+
+  return services_resource_build_index_list($results, 'user', 'uid');
+}
