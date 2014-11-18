@@ -37,9 +37,19 @@ function moodle_sso_default_services_endpoint() {
     ),
   );
   $endpoint->resources = array(
+    'moodlesso' => array(
+      'operations' => array(
+        'index' => array(
+          'enabled' => '1',
+        ),
+      ),
+    ),
     'system' => array(
       'actions' => array(
         'connect' => array(
+          'enabled' => '1',
+        ),
+        'get_variable' => array(
           'enabled' => '1',
         ),
       ),
