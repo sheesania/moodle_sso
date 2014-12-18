@@ -85,13 +85,13 @@ function moodle_sso_access(){
 }
 
 function moodle_sso_get_settings(){
-
+  global $cookie_domain;
   foreach(field_info_instances('user','user') as $name=>$instance){
     $fields[]=field_info_field($instance['field_name']);
   }
 
   $settings=array(
-    'cookie_domain'=>ini_get('session.cookie_domain'),
+    'cookie_domain'=>$cookie_domain,
     'role'=>array(), //todo: convert this to a role lookup by machine name
 //    'userdef'=>$fields,
 //    'userdef'=>field_info_instances('user','user'),
