@@ -6,6 +6,49 @@
 
 include_once 'moodle_sso.features.inc';
 
+/**
+ *  Implements hook_menu().
+ */
+function moodle_sso_menu()
+{
+
+  $items['admin/config/people/moodle_sso'] = array(
+    'title' => t("moodle sso settings"),
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('moodle_sso_settings'),
+    'access arguments' => array('configure moodle sso settings'),
+    'file' => 'moodle_sso.admin.inc',
+  );
+  return $items;
+}
+
+/**
+ *  Implements hook_user_login().
+ */
+function moodle_sso_user_login(&$edit, $account)
+{
+  // the moodle connector module also has the moodle uri in it. we should consolidate on using that if it is available
+
+  if(module_exists('moodle_connector')){
+    $moodle_url = variable_get('moodle_connector_url','');
+  }
+  else{
+    $moodle_url = variable_get('moodle_sso_uri','');
+  }
+  // this is a moodle login request
+  if(isset($_GET['moodle_destination']) && $moodle_url <> '') {
+    //mimic the drupal_goto attack vector fix
+    $destination = drupal_parse_url($_GET['moodle_destination']);
+    $moodle_url .= "/" . $destination['path'];
+    $options['query'] = $destination['query'];
+    $options['fragment'] = $destination['fragment'];
+    // stop anything that was previously trying to redirect users
+    unset($_GET['destination']);
+    //set this form to redirect to
+    $edit['redirect'] = array($moodle_url, $options);
+  }
+}
 
 /** Implements hook services_resources to declare a moodlesso specific service call that provides
  *  a few things:
