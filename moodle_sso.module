@@ -30,24 +30,24 @@ function moodle_sso_user_login(&$edit, $account)
 {
   // the moodle connector module also has the moodle uri in it. we should consolidate on using that if it is available
 
-  if(module_exists('moodle_connector')){
-    $moodle_url = variable_get('moodle_connector_url','');
+}
+
+/**
+ *  Implements hook_drupal_goto_alter().
+ */
+function moodle_sso_drupal_goto_alter(&$path, &$options, &$http_response_code)
+{
+  if(isset($_GET['moodle_url'])) {
+    if(module_exists('moodle_connector')){
+      $moodle_url = variable_get('moodle_connector_url','');
+    }
+    else{
+      $moodle_url = variable_get('moodle_sso_uri','');
+    }
+    // this is a moodle login request
+    $path = $moodle_url . "/" . $path;
   }
-  else{
-    $moodle_url = variable_get('moodle_sso_uri','');
-  }
-  // this is a moodle login request
-  if(isset($_GET['moodle_destination']) && $moodle_url <> '') {
-    //mimic the drupal_goto attack vector fix
-    $destination = drupal_parse_url($_GET['moodle_destination']);
-    $moodle_url .= "/" . $destination['path'];
-    $options['query'] = $destination['query'];
-    $options['fragment'] = $destination['fragment'];
-    // stop anything that was previously trying to redirect users
-    unset($_GET['destination']);
-    //set this form to redirect to
-    $edit['redirect'] = array($moodle_url, $options);
-  }
+
 }
 
 /** Implements hook services_resources to declare a moodlesso specific service call that provides
