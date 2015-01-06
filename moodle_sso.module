@@ -26,10 +26,16 @@ function moodle_sso_menu()
 /**
  *  Implements hook_user_login().
  */
-function moodle_sso_user_login(&$edit, $account)
+/**
+ *  Implements hook_user_logout().
+ */
+function moodle_sso_user_logout($account)
 {
-  // the moodle connector module also has the moodle uri in it. we should consolidate on using that if it is available
-
+  global $cookie_domain;
+  if(variable_get('moodle_sso_logout_moodle', false)) {
+    unset($_COOKIE['MoodleSession']);
+    setcookie(variable_get('moodle_sso_cookie_name', 'MoodleSession'), '', 1, variable_get('moodle_sso_cookie_path', '/'), variable_get('moodle_sso_cookie_domain', $cookie_domain));
+  }
 }
 
 /**
