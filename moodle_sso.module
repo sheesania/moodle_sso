@@ -70,7 +70,10 @@ function moodle_sso_user_logout($account)
  * @return \Drupal\Core\Access\AccessResultAllowed|\Drupal\Core\Access\AccessResultNeutral
  */
 function moodle_sso_entity_field_access($operation, $field_definition, $account, $items = NULL) {
-  // Allow view access for status, and changed fields.
+  // Allow view access for mail, status, and changed fields.
+  if ($field_definition->getName() == 'mail' && $operation == 'view') {
+    return AccessResult::allowed();
+  }
   if ($field_definition->getName() == 'status' && $operation == 'view') {
     return AccessResult::allowed();
   }
