@@ -51,7 +51,8 @@ function moodle_sso_drupal_goto_alter(&$path, &$options, &$http_response_code)
       $moodle_url = variable_get('moodle_sso_uri','');
     }
     // this is a moodle login request
-    $path = $moodle_url . "/" . $path;
+    $decoded_path = urldecode($path);
+    $path = $moodle_url . "/" . $decoded_path;
   }
 
 }
